@@ -4,7 +4,7 @@
 
 ## Live Demo
 
-👉 **[Try it here](https://mn-bakeoff-demo.github.io/msp-solution-alpha)**
+👉 **[Try it here](https://mes-bakeoff-demo.github.io/msp-solution-alpha)**
 
 ---
 
