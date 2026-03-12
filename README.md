@@ -1,10 +1,12 @@
 # MSP Solution: Alpha
 
-> 🍰 **Vendor Alpha's Approach** — Rules-Based Eligibility Engine
+**Vendor Alpha's Approach** — Rules-Based Eligibility Engine
+
+**Backlog Item:** [#1 MSP Auto-Enrollment](https://github.com/mes-bakeoff-demo/mes-modernization/issues/1)
 
 ## Live Demo
 
-👉 **[Try it here](https://mes-bakeoff-demo.github.io/msp-solution-alpha)**
+[Try it here](https://mes-bakeoff-demo.github.io/msp-solution-alpha)
 
 ---
 
@@ -128,4 +130,4 @@ MIT — Use freely, adapt as needed.
 
 ---
 
-*Built for the Minnesota MES Bake-Off Demo*
+*Built for the [MES Bake-Off Demo](https://github.com/mes-bakeoff-demo) — see [Issue #1](https://github.com/mes-bakeoff-demo/mes-modernization/issues/1) for requirements*
