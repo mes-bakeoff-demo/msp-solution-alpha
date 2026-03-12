@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MSP Eligibility Checker — Alpha</title>
+  <style>
+    :root {
+      --primary: #003865;
+      --secondary: #78BE21;
+      --error: #d32f2f;
+      --warning: #f57c00;
+      --success: #388e3c;
+      --bg: #f5f5f5;
+      --card: #ffffff;
+      --text: #333333;
+      --text-light: #666666;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    
+    header p {
+      opacity: 0.9;
+      font-size: 0.9rem;
+    }
+    
+    .badge {
+      display: inline-block;
+      background: var(--secondary);
+      color: var(--primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+    
+    main {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    
+    .card {
+      background: var(--card);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .card h2 {
+      color: var(--primary);
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--bg);
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+    }
+    
+    .hint {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 0.25rem;
+    }
+    
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,56,101,0.1);
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .checkbox-group input {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+    
+    button {
+      width: 100%;
+      padding: 1rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    button:hover {
+      background: #004a87;
+    }
+    
+    button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0,56,101,0.3);
+    }
+    
+    #result {
+      display: none;
+    }
+    
+    #result.show {
+      display: block;
+    }
+    
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .result-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .result-icon.eligible {
+      background: #e8f5e9;
+      color: var(--success);
+    }
+    
+    .result-icon.not-eligible {
+      background: #ffebee;
+      color: var(--error);
+    }
+    
+    .result-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    
+    .result-title.eligible {
+      color: var(--success);
+    }
+    
+    .result-title.not-eligible {
+      color: var(--error);
+    }
+    
+    .program-badge {
+      display: inline-block;
+      background: var(--secondary);
+      color: var(--primary);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: 600;
+      margin: 0.5rem 0;
+    }
+    
+    .explanation {
+      background: var(--bg);
+      padding: 1rem;
+      border-radius: 4px;
+      margin-top: 1rem;
+    }
+    
+    .explanation h3 {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+    
+    .explanation ul {
+      margin-left: 1.25rem;
+    }
+    
+    .explanation li {
+      margin-bottom: 0.25rem;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-light);
+      font-size: 0.85rem;
+    }
+    
+    footer a {
+      color: var(--primary);
+    }
+    
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.25rem;
+      }
+      
+      .card {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MSP Eligibility Checker</h1>
+    <p>Medicare Savings Program Determination Tool</p>
+    <span class="badge">Vendor Alpha — Rules-Based</span>
+  </header>
+  
+  <main>
+    <form id="eligibility-form" class="card">
+      <h2>Beneficiary Information</h2>
+      
+      <div class="form-group">
+        <label for="age">Age</label>
+        <input type="number" id="age" min="0" max="120" required placeholder="65">
+      </div>
+      
+      <div class="form-group">
+        <label for="income">Monthly Income ($)</label>
+        <p class="hint">Gross monthly income from all sources</p>
+        <input type="number" id="income" min="0" step="0.01" required placeholder="1200">
+      </div>
+      
+      <div class="form-group">
+        <label for="household">Household Size</label>
+        <select id="household" required>
+          <option value="1">1 person</option>
+          <option value="2">2 people</option>
+          <option value="3">3 people</option>
+          <option value="4">4 people</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="medicare" checked>
+          <label for="medicare">Currently enrolled in Medicare</label>
+        </div>
+      </div>
+      
+      <button type="submit">Check Eligibility</button>
+    </form>
+    
+    <div id="result" class="card" role="alert" aria-live="polite">
+      <!-- Results populated by JavaScript -->
+    </div>
+  </main>
+  
+  <footer>
+    <p>
+      <strong>Demo Only</strong> — Not for actual eligibility determinations<br>
+      Part of the <a href="https://github.com/mn-bakeoff-demo">MN Bake-Off Demo</a>
+    </p>
+  </footer>
+  
+  <script>
+    // 2024 Federal Poverty Level (annual)
+    const FPL_2024 = {
+      1: 15060,
+      2: 20440,
+      3: 25820,
+      4: 31200
+    };
+    
+    // MSP Program thresholds (% of FPL)
+    const MSP_PROGRAMS = {
+      QMB: { max: 100, name: 'Qualified Medicare Beneficiary', benefits: 'Medicare Part A & B premiums, deductibles, and coinsurance' },
+      SLMB: { max: 120, name: 'Specified Low-Income Medicare Beneficiary', benefits: 'Medicare Part B premium' },
+      QI: { max: 135, name: 'Qualifying Individual', benefits: 'Medicare Part B premium' }
+    };
+    
+    function getFPL(householdSize) {
+      return FPL_2024[householdSize] || FPL_2024[4];
+    }
+    
+    function determineMSPEligibility(age, monthlyIncome, householdSize, hasMedicare) {
+      const result = {
+        eligible: false,
+        program: null,
+        programName: null,
+        benefits: null,
+        confidence: 'high',
+        explanation: [],
+        incomePercent: 0
+      };
+      
+      // Annual income from monthly
+      const annualIncome = monthlyIncome * 12;
+      const fpl = getFPL(householdSize);
+      result.incomePercent = Math.round((annualIncome / fpl) * 100);
+      
+      result.explanation.push(`Annual income: $${annualIncome.toLocaleString()} (${result.incomePercent}% of FPL)`);
+      result.explanation.push(`Federal Poverty Level for household of ${householdSize}: $${fpl.toLocaleString()}`);
+      
+      // Check Medicare enrollment
+      if (!hasMedicare) {
+        result.explanation.push('❌ Must be enrolled in Medicare to qualify for MSP');
+        return result;
+      }
+      result.explanation.push('✓ Enrolled in Medicare');
+      
+      // Check age (simplified - in reality, disability also qualifies)
+      if (age < 65) {
+        result.explanation.push('❌ Must be 65 or older (or disabled) to qualify');
+        return result;
+      }
+      result.explanation.push('✓ Age requirement met');
+      
+      // Determine program based on income
+      if (result.incomePercent <= MSP_PROGRAMS.QMB.max) {
+        result.eligible = true;
+        result.program = 'QMB';
+        result.programName = MSP_PROGRAMS.QMB.name;
+        result.benefits = MSP_PROGRAMS.QMB.benefits;
+        result.explanation.push(`✓ Income at or below ${MSP_PROGRAMS.QMB.max}% FPL — qualifies for QMB`);
+      } else if (result.incomePercent <= MSP_PROGRAMS.SLMB.max) {
+        result.eligible = true;
+        result.program = 'SLMB';
+        result.programName = MSP_PROGRAMS.SLMB.name;
+        result.benefits = MSP_PROGRAMS.SLMB.benefits;
+        result.explanation.push(`✓ Income between 100-${MSP_PROGRAMS.SLMB.max}% FPL — qualifies for SLMB`);
+      } else if (result.incomePercent <= MSP_PROGRAMS.QI.max) {
+        result.eligible = true;
+        result.program = 'QI';
+        result.programName = MSP_PROGRAMS.QI.name;
+        result.benefits = MSP_PROGRAMS.QI.benefits;
+        result.explanation.push(`✓ Income between 120-${MSP_PROGRAMS.QI.max}% FPL — qualifies for QI`);
+      } else {
+        result.explanation.push(`❌ Income exceeds 135% FPL — does not qualify for MSP`);
+      }
+      
+      return result;
+    }
+    
+    function renderResult(result) {
+      const resultDiv = document.getElementById('result');
+      
+      if (result.eligible) {
+        resultDiv.innerHTML = `
+          <div class="result-header">
+            <div class="result-icon eligible">✓</div>
+            <div>
+              <div class="result-title eligible">Likely Eligible</div>
+              <div>Confidence: ${result.confidence}</div>
+            </div>
+          </div>
+          <div class="program-badge">${result.program}: ${result.programName}</div>
+          <p><strong>Benefits:</strong> ${result.benefits}</p>
+          <div class="explanation">
+            <h3>How we determined this:</h3>
+            <ul>
+              ${result.explanation.map(e => `<li>${e}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      } else {
+        resultDiv.innerHTML = `
+          <div class="result-header">
+            <div class="result-icon not-eligible">✗</div>
+            <div>
+              <div class="result-title not-eligible">Not Eligible</div>
+              <div>Based on information provided</div>
+            </div>
+          </div>
+          <div class="explanation">
+            <h3>Why not eligible:</h3>
+            <ul>
+              ${result.explanation.map(e => `<li>${e}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      }
+      
+      resultDiv.classList.add('show');
+      resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    // Form submission
+    document.getElementById('eligibility-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const age = parseInt(document.getElementById('age').value);
+      const income = parseFloat(document.getElementById('income').value);
+      const household = parseInt(document.getElementById('household').value);
+      const medicare = document.getElementById('medicare').checked;
+      
+      const result = determineMSPEligibility(age, income, household, medicare);
+      renderResult(result);
+    });
+  </script>
+</body>
+</html>
